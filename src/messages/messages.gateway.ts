@@ -9,6 +9,7 @@ import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { Server, Socket } from 'socket.io';
+import { AsyncApiPub } from 'nestjs-asyncapi';
 
 @WebSocketGateway({
   cors: {
@@ -21,6 +22,13 @@ export class MessagesGateway {
   server: Server;
 
   @SubscribeMessage('createMessage')
+  @AsyncApiPub({
+    channel: 'send/message',
+    summary: 'Send messages',
+    message: {
+      payload: CreateMessageDto,
+    },
+  })
   async create(
     @MessageBody() createMessageDto: CreateMessageDto,
     @ConnectedSocket() client: Socket,
@@ -44,6 +52,12 @@ export class MessagesGateway {
   }
 
   @SubscribeMessage('updateMessage')
+  @AsyncApiPub({
+    channel: 'update/message',
+    message: {
+      payload: UpdateMessageDto,
+    },
+  })
   update(@MessageBody() updateMessageDto: UpdateMessageDto) {
     return this.messagesService.update(updateMessageDto.id, updateMessageDto);
   }
