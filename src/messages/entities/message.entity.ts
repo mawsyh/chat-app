@@ -1,4 +1,4 @@
-export class Message {
+export class MessageEnt {
   name: string;
   text: string;
 }
